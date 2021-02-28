@@ -1,17 +1,7 @@
 import Foundation
 
-// Defines a reference for the module container
-var moduleContainer: DependencyContainerInterface = DependencyContainer.global
-
 /// Defines the failure handler for the module configurator
-public typealias ModuleConfiguratorFailureHandler = (@autoclosure () -> String, StaticString, UInt) -> Void
-var moduleFailureHandler: ModuleConfiguratorFailureHandler = { message, file, line in
-    fatalError(
-        message(),
-        file: file,
-        line: line
-    )
-}
+public typealias LightInjectionConfiguratorFailureHandler = (@autoclosure () -> String, StaticString, UInt) -> Void
 
 /// Registers a Lazy Dependency on the global container.
 /// - Parameters:
@@ -26,12 +16,12 @@ public func registerLazyDependency<T>(
     line: UInt = #line
 ) {
     do {
-        try moduleContainer.registerLazyDependency(
+        try ModuleEnvironment.dependencyContainer.registerLazyDependency(
             factory: factory,
             forMetaType: metaType
         )
     } catch {
-        moduleFailureHandler(error.localizedDescription, file, line)
+        ModuleEnvironment.configuratorFailureHandler(error.localizedDescription, file, line)
     }
 }
 
@@ -48,11 +38,11 @@ public func register<T>(
     line: UInt = #line
 ) {
     do {
-        try moduleContainer.register(
+        try  ModuleEnvironment.dependencyContainer.register(
             instance: instance,
             forMetaType: metaType
         )
     } catch {
-        moduleFailureHandler(error.localizedDescription, file, line)
+        ModuleEnvironment.configuratorFailureHandler(error.localizedDescription, file, line)
     }
 }

@@ -35,6 +35,16 @@ final class DependencyTests: XCTestCase {
         XCTAssertTrue(sut.wrappedValue === instance)
         XCTAssertTrue(sut.container === DependencyContainer.global)
     }
+    
+    func test_convenienceInitPassingModule_shouldSetItsContainerAsTheResolver() {
+        // Given
+        let resolver: DependencyContainer = .init()
+        DependencyTestsModuleMock.initialize(withDependenciesContainer: resolver)
+        // When
+        let sut: Dependency<MyDependencyProtocol> = .init(ownedBy: DependencyTestsModuleMock.self)
+        // Then
+        XCTAssertTrue(sut.container === resolver)
+    }
 
     func test_dependencyCannotBeResolvedTwice() {
         // Given
@@ -92,6 +102,11 @@ final class DependencyTests: XCTestCase {
 }
 
 // MARK: - Test Doubles
+
+enum DependencyTestsModuleMock: Module {
+    static var container: DependencyContainerInterface!
+    static var failureHandler: ModuleFailureHandler!
+}
 
 final class DependencyContainerMock: DependencyContainerInterface {
     var getValueToBeReturned: Any?
