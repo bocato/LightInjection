@@ -1,0 +1,72 @@
+disabled_rules:
+  - line_length
+  - shorthand_operator
+  - trailing_whitespace
+  - identifier_name
+  - missing_docs
+  - file_length
+  - implicit_return
+  - trailing_closure
+  - cyclomatic_complexity
+  - type_name
+  - function_parameter_count
+  - force_try
+  - type_body_length
+  - function_body_length
+  - trailing_comma
+
+opt_in_rules:
+  - force_unwrapping
+  - anyobject_protocol
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_first_not_nil
+  - empty_string
+  - empty_xctest_method
+  - explicit_failure_calls
+  - explicit_init
+  - fallthrough
+  - fatal_error_message
+  - first_where
+  - identical_operands
+  - implicitly_unwrapped_optional
+  - joined_default_parameter
+  - let_var_whitespace
+  - literal_expression_end_indentation
+  - multiline_arguments
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - nimble_operator
+  - object_literal
+  - operator_usage_whitespace
+  - overridden_super_call
+  - override_in_extension
+  - pattern_matching_keywords
+  - prohibited_super_call
+  - quick_discouraged_focused_test
+  - quickspec_class_name
+  - redundant_nil_coalescing
+  - return_arrow_whitespace
+  - single_test_class
+  - sorted_first_last
+  - static_operator
+  - switch_case_on_newline
+  - trailing_closure
+  - unneeded_parentheses_in_closure_argument
+  - untyped_error_in_catch
+  - vertical_parameter_alignment_on_call
+  - yoda_condition
+
+excluded:
+  - /Modules/Sources/Tests
+
+type_body_length:
+  warning: 200
+
+nesting:
+  type_level:
+    warning: 5
+  statement_level:
+    warning: 5
