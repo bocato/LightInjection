@@ -10,10 +10,13 @@ final class MyDependency: MyDependencyProtocol {}
 protocol MyLazyDependencyProtocol {}
 final class MyLazyDependency: MyLazyDependencyProtocol {}
 
-final class MyModule: Module {}
-
 protocol ContainerSpecificDependency {}
 final class MyModuleSpecificDependency: ContainerSpecificDependencyProtocol {}
+
+enum MyModule: Module {
+    static var container: DependencyContainerInterface!
+    static var failureHandler: ModuleFailureHandler!
+}
 
 protocol ModuleSpecificDependencyProtocol {}
 final class ModuleSpecificDependency: ModuleSpecificDependencyProtocol {}
@@ -44,13 +47,6 @@ final class ViewModel {
     }
 }
 
-// Module Setups
-MyModule.initialize() // can set an specific container also
-MyModule.register(
-    instance: MyModuleSpecificDependency(),
-    forMetaType: MyModuleSpecificDependencyProtocol.self
-)
-
 // Global Container Setups
 LightInjection.register(
     instance: MyDependency(),
@@ -59,5 +55,12 @@ LightInjection.register(
 LightInjection.registerLazyDependency(
     factory: MyLazyDependency.init,
     forMetaType: MyLazyDependencyProtocol.self
+)
+
+// Module Setups
+MyModule.initialize()
+MyModule.register(
+    instance: MyModuleSpecificDependency(),
+    forMetaType: MyModuleSpecificDependencyProtocol.self
 )
 ```

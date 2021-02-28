@@ -46,6 +46,13 @@ public final class Dependency<T> {
             resolver: DependencyContainer.global
         )
     }
+    
+    public convenience init(ownedBy module: Module.Type) {
+        self.init(
+            resolvedValue: nil,
+            resolver: module.container
+        )
+    }
 
     // MARK: - Public Methods
 
