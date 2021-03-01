@@ -3,35 +3,49 @@ import Foundation
 /// Defines the failure handler for Modules
 public typealias ModuleFailureHandler =  (@autoclosure () -> String, StaticString, UInt) -> Void
 
-/// Defines a the entry point for a Module, which will hold it's dependency container.
+/// Defines the type of container  to use for the module.
+public enum ModuleContainerOption {
+    /// Uses the Global/  Shared `DependencyContainer` to hold the module's dependencies.
+    case global
+    /// Creates an exclusive `DependencyContainer` to hold the module's dependencies.
+    case exclusive
+    /// Provides a custom `DependencyContainer` to hold the module's dependencies.
+    case custom(DependencyContainerInterface)
+}
+
+/// Defines a the entry point / context holder for a Module, which will hold it's dependency container.
 // swiftlint:disable: implicitly_unwrapped_optional
 public protocol Module {
     /// The container for the module specific dependencies
     static var container: DependencyContainerInterface! { get set }
-    /// The handler to deal with failures
-    static var failureHandler: ModuleFailureHandler! { get set }
 }
-public extension Module { // TODO: Avoid initialization?
-    // MARK: - Public API
-    
+public extension Module {
     /// Initializes the module.
     /// - Parameters:
-    ///   - customContainer: a custom container, that if not provided, will be assumed as the Global Container
+    ///   - container: defines which container will hold the module dependencies, based on the `ModuleContainerOption` provided, the default value is the to use the Global / Sahred Container.
     ///   - customFailureHandler: a custom failure handler, if you want to log anything of simply have more info about module related failures
     ///   - file: the file that called this function
     ///   - line: the line of the file that called this function
     static func initialize(
-        withDependenciesContainer customContainer: DependencyContainerInterface? = nil,
+        container containerOption: ModuleContainerOption = .global,
         failureHandler customFailureHandler: ModuleFailureHandler? = nil,
         file: StaticString = #file,
         line: UInt = #line
     ) {
-        Self.failureHandler = customFailureHandler ?? ModuleEnvironment.moduleFailureHandler
+        let failureHandler = customFailureHandler ?? LightInjectionEnvironment.moduleFailureHandler
         guard container == nil else {
             failureHandler("The container should not be initialized twice!", file, line)
             return
         }
-        Self.container = customContainer ?? ModuleEnvironment.dependencyContainer
+        
+        switch containerOption {
+        case .global:
+            Self.container = LightInjectionEnvironment.globalDependencyContainer
+        case .exclusive:
+            Self.container = LightInjectionEnvironment.moduleExclusiveDependencyContainerBuilder()
+        case let .custom(customContainer):
+            Self.container = customContainer
+        }
     }
     
     /// Registers a dependency factory for the given type, and stores it on the module dependencies container.
@@ -44,6 +58,7 @@ public extension Module { // TODO: Avoid initialization?
     static func registerLazyDependency<T>(
         factory: @escaping LazyDependencyFactory,
         forMetaType metaType: T.Type,
+        failureHandler customFailureHandler: ModuleFailureHandler? = nil,
         file: StaticString = #file,
         line: UInt = #line
     ) {
@@ -53,6 +68,7 @@ public extension Module { // TODO: Avoid initialization?
                 forMetaType: metaType
             )
         } catch {
+            let failureHandler = customFailureHandler ?? LightInjectionEnvironment.moduleFailureHandler
             failureHandler(error.localizedDescription, file, line)
         }
     }
@@ -66,6 +82,7 @@ public extension Module { // TODO: Avoid initialization?
     static func register<T>(
         instance: T,
         forMetaType metaType: T.Type,
+        failureHandler customFailureHandler: ModuleFailureHandler? = nil,
         file: StaticString = #file,
         line: UInt = #line
     ) {
@@ -75,6 +92,7 @@ public extension Module { // TODO: Avoid initialization?
                 forMetaType: metaType
             )
         } catch {
+            let failureHandler = customFailureHandler ?? LightInjectionEnvironment.moduleFailureHandler
             failureHandler(error.localizedDescription, file, line)
         }
     }

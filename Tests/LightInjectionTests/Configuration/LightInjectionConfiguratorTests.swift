@@ -10,7 +10,7 @@ final class LightInjectionConfiguratorTests: XCTestCase {
     // MARK: - Tests
 
     func test_registerLazyDependency_shouldStoreInstance_whenRegistrationSucceeds() {
-        ModuleEnvironment.dependencyContainer = dependencyContainerMock
+        LightInjectionEnvironment.globalDependencyContainer = dependencyContainerMock
 
         let factory: LazyDependencyFactory = MyDependency.init
         let metaType = MyDependencyProtocol.self
@@ -26,8 +26,8 @@ final class LightInjectionConfiguratorTests: XCTestCase {
 
     func test_registerLazyDependency_shouldCallTheFailureHandler_whenRegistrationFails() {
         // Given
-        ModuleEnvironment.dependencyContainer = dependencyContainerMock
-        ModuleEnvironment.configuratorFailureHandler = failureHandlerSpy.closure
+        LightInjectionEnvironment.globalDependencyContainer = dependencyContainerMock
+        LightInjectionEnvironment.libraryConfiguratorFailureHandler = failureHandlerSpy.closure
 
         let factory: LazyDependencyFactory = MyDependency.init
         let metaType = MyDependencyProtocol.self
@@ -46,7 +46,7 @@ final class LightInjectionConfiguratorTests: XCTestCase {
 
     func test_registerInstance_shouldStoreInstance_whenRegistrationSucceeds() {
         // Given
-        ModuleEnvironment.dependencyContainer = dependencyContainerMock
+        LightInjectionEnvironment.globalDependencyContainer = dependencyContainerMock
 
         let instance: MyDependencyProtocol = MyDependency()
         let metaType = MyDependencyProtocol.self
@@ -63,8 +63,8 @@ final class LightInjectionConfiguratorTests: XCTestCase {
 
     func test_registerInstance_shouldCallTheFailureHandler_whenRegistrationFails() {
         // Given
-        ModuleEnvironment.dependencyContainer = dependencyContainerMock
-        ModuleEnvironment.configuratorFailureHandler = failureHandlerSpy.closure
+        LightInjectionEnvironment.globalDependencyContainer = dependencyContainerMock
+        LightInjectionEnvironment.libraryConfiguratorFailureHandler = failureHandlerSpy.closure
 
         let instance: MyDependencyProtocol = MyDependency()
         let metaType = MyDependencyProtocol.self

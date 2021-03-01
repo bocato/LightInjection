@@ -16,12 +16,12 @@ public func registerLazyDependency<T>(
     line: UInt = #line
 ) {
     do {
-        try ModuleEnvironment.dependencyContainer.registerLazyDependency(
+        try LightInjectionEnvironment.globalDependencyContainer.registerLazyDependency(
             factory: factory,
             forMetaType: metaType
         )
     } catch {
-        ModuleEnvironment.configuratorFailureHandler(error.localizedDescription, file, line)
+        LightInjectionEnvironment.libraryConfiguratorFailureHandler(error.localizedDescription, file, line)
     }
 }
 
@@ -38,11 +38,11 @@ public func register<T>(
     line: UInt = #line
 ) {
     do {
-        try  ModuleEnvironment.dependencyContainer.register(
+        try  LightInjectionEnvironment.globalDependencyContainer.register(
             instance: instance,
             forMetaType: metaType
         )
     } catch {
-        ModuleEnvironment.configuratorFailureHandler(error.localizedDescription, file, line)
+        LightInjectionEnvironment.libraryConfiguratorFailureHandler(error.localizedDescription, file, line)
     }
 }

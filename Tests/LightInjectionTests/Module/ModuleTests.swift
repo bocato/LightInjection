@@ -9,15 +9,36 @@ final class ModuleTests: XCTestCase {
 
     // MARK: - Tests
     
-    func test_initialize_withoutParametersShouldUseGlobalContainer() {
+    func test_initialize_withoutProvidingContainerParameters_shouldUseGlobalContainer() {
         // Given
         TestModule.container = nil
-        ModuleEnvironment.dependencyContainer = DependencyContainer()
-        let globalContainer = ModuleEnvironment.dependencyContainer
+        let globalContainerMock: DependencyContainer = .init()
+        LightInjectionEnvironment.globalDependencyContainer = globalContainerMock
         // When
         TestModule.initialize()
         // Then
-        XCTAssertTrue(TestModule.container === globalContainer)
+        XCTAssertTrue(TestModule.container === globalContainerMock)
+    }
+    
+    func test_initialize_withExclusiveContainer_shouldUseANewContainerSpeciallyForTheModule() {
+        // Given
+        TestModule.container = nil
+        let moduleExclusiveContainer: DependencyContainer = .init()
+        LightInjectionEnvironment.moduleExclusiveDependencyContainerBuilder = { moduleExclusiveContainer }
+        // When
+        TestModule.initialize(container: .exclusive)
+        // Then
+        XCTAssertTrue(TestModule.container === moduleExclusiveContainer)
+    }
+    
+    func test_initialize_withCustomContainer_shouldUseTheProvidedContainer() {
+        // Given
+        TestModule.container = nil
+        let customContainer: DependencyContainer = .init()
+        // When
+        TestModule.initialize(container: .custom(customContainer))
+        // Then
+        XCTAssertTrue(TestModule.container === customContainer)
     }
     
     func test_initialize_whenTheModuleIsInitializedTwice_itShouldCallTheFailureHandler() {
@@ -39,7 +60,7 @@ final class ModuleTests: XCTestCase {
         // Given
         TestModule.container = nil
         let dependencyContainerMock: DependencyContainerMock = .init()
-        TestModule.initialize(withDependenciesContainer: dependencyContainerMock)
+        TestModule.initialize(container: .custom(dependencyContainerMock))
         let factory: LazyDependencyFactory = MyDependency.init
         let metaType = MyDependencyProtocol.self
         let metaTypeName = String(describing: metaType)
@@ -62,11 +83,10 @@ final class ModuleTests: XCTestCase {
 
         let containerFailure: DependencyContainerFailure = .tryingToRegisterDependencyTwice(metaTypeName)
         dependencyContainerMock.registerLazyDependencyErrorToBeThrown = containerFailure
+        
+        LightInjectionEnvironment.moduleFailureHandler = failureHandlerSpy.closure
 
-        TestModule.initialize(
-            withDependenciesContainer: dependencyContainerMock,
-            failureHandler: failureHandlerSpy.closure
-        )
+        TestModule.initialize(container: .custom(dependencyContainerMock))
 
         // When
         TestModule.registerLazyDependency(factory: factory, forMetaType: metaType)
@@ -80,7 +100,7 @@ final class ModuleTests: XCTestCase {
         // Given
         TestModule.container = nil
         let dependencyContainerMock: DependencyContainerMock = .init()
-        TestModule.initialize(withDependenciesContainer: dependencyContainerMock)
+        TestModule.initialize(container: .custom(dependencyContainerMock))
         let instance: MyDependencyProtocol = MyDependency()
         let metaType = MyDependencyProtocol.self
         let metaTypeName = String(describing: metaType)
@@ -104,11 +124,10 @@ final class ModuleTests: XCTestCase {
 
         let containerFailure: DependencyContainerFailure = .tryingToRegisterDependencyTwice(metaTypeName)
         dependencyContainerMock.registerInstanceErrorToBeThrown = containerFailure
-
-        TestModule.initialize(
-            withDependenciesContainer: dependencyContainerMock,
-            failureHandler: failureHandlerSpy.closure
-        )
+        
+        LightInjectionEnvironment.moduleFailureHandler = failureHandlerSpy.closure
+        
+        TestModule.initialize(container: .custom(dependencyContainerMock))
 
         // When
         TestModule.register(instance: instance, forMetaType: metaType)

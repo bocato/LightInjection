@@ -33,7 +33,7 @@ public final class DependencyContainer: DependencyContainerInterface {
         factory: @escaping LazyDependencyFactory,
         forMetaType metaType: T.Type
     ) throws {
-        let name = String(describing: metaType)
+        let name = String(describing: metaType) // TODO: Change to ObjectIdentifier?
         guard lazyDependencyFactories[name] == nil else {
             throw DependencyContainerFailure.tryingToRegisterDependencyTwice(name)
         }

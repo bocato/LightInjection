@@ -39,7 +39,7 @@ final class DependencyTests: XCTestCase {
     func test_convenienceInitPassingModule_shouldSetItsContainerAsTheResolver() {
         // Given
         let resolver: DependencyContainer = .init()
-        DependencyTestsModuleMock.initialize(withDependenciesContainer: resolver)
+        DependencyTestsModuleMock.initialize(container: .custom(resolver))
         // When
         let sut: Dependency<MyDependencyProtocol> = .init(ownedBy: DependencyTestsModuleMock.self)
         // Then
