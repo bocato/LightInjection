@@ -1,13 +1,13 @@
 # LightInjection
 
 ## Installation
-You can add ComposableArchitecture to an Xcode project by adding it as a package dependency.
+You can add LightInjection to an Xcode project by adding it as a package dependency.
 
   1. From the **File** menu, select **Swift Packages › Add Package Dependency…**
-  2. Enter "https://github.com/bocato/LightInjection" into the package repository URL text field
+  2. Enter `https://github.com/bocato/LightInjection`into the package repository URL text field
   3. Depending on how your project is structured:
       - If you have a single application target that needs access to the library, then add **LightInjection** directly to your application.
-      - If you want to use this library from multiple targets you must create a shared framework that depends on **ComposableArchitecture** and then depend on that framework in all of your targets.
+      - If you want to use this library from multiple targets you must create a shared framework that depends on **LightInjection** and then depend on that framework in all of your targets.
 
 ## Basic Usage (to be improved)
 ```swift
@@ -65,11 +65,18 @@ LightInjection.registerLazyDependency(
 )
 
 // Module Setups
-MyModule.initialize()
+MyModule.initialize() // If you want to use the global container
+
+MyModule.initialize(container: .exclusive) // If you want that the module has it's own container
+
+let myCustomContainer: DependencyContainerInterface = MyCustomDepencyContainer()
+MyModule.initialize(container: .custom(myCustomContainer)) // If you want that the module has it's own container, but with a custom instance/implementation
+
 MyModule.register(
     instance: MyModuleSpecificDependency(),
     forMetaType: MyModuleSpecificDependencyProtocol.self
 )
 ```
 
-## // TODO: Improve DOCS...
+# // TODO: Improve DOCS...
+Improve DOCS!!!
