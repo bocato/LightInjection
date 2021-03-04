@@ -1,6 +1,10 @@
 @testable import LightInjection
 import XCTest
 
+extension DependencyContainerInterface  {
+    static var mock: DependencyContainerInterface { DependencyContainer() }
+}
+
 final class DependencyTests: XCTestCase {
     // MARK: - Properties
 

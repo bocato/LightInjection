@@ -18,6 +18,13 @@ public enum ModuleContainerOption {
 public protocol Module {
     /// The container for the module specific dependencies
     static var container: DependencyContainerInterface! { get set }
+    
+    /// Defines a place to do any aditional setups after the initialization
+    /// This is where you can, for example, register container specific / internal dependencies, or create any aditional setup for your module that the default initializar doesn't
+    /// - Parameters:
+    ///   - container: the container that was just initialized when `initialize(container:failureHandler:)` was called
+    ///   - failureHandler: the failure handler that was set when `initialize(container:failureHandler:)` was called
+    static func setup(_ container: DependencyContainerInterface, _ failureHandler: ModuleFailureHandler)
 }
 public extension Module {
     /// Initializes the module.
@@ -38,14 +45,18 @@ public extension Module {
             return
         }
         
+        let moduleContainer: DependencyContainerInterface
         switch containerOption {
         case .global:
-            Self.container = LightInjectionEnvironment.globalDependencyContainer
+            moduleContainer = LightInjectionEnvironment.globalDependencyContainer
         case .exclusive:
-            Self.container = LightInjectionEnvironment.moduleExclusiveDependencyContainerBuilder()
+            moduleContainer = LightInjectionEnvironment.moduleExclusiveDependencyContainerBuilder()
         case let .custom(customContainer):
-            Self.container = customContainer
+            moduleContainer = customContainer
         }
+        Self.container = moduleContainer
+        
+        Self.setup(moduleContainer, failureHandler)
     }
     
     /// Registers a dependency factory for the given type, and stores it on the module dependencies container.
@@ -96,4 +107,7 @@ public extension Module {
             failureHandler(error.localizedDescription, file, line)
         }
     }
+    
+    // Pre-implementation, in case there is nothing to be done after initialization
+    static func setup(_ container: DependencyContainerInterface, _ failureHandler: ModuleFailureHandler) {}
 }

@@ -136,14 +136,34 @@ final class ModuleTests: XCTestCase {
         XCTAssertTrue(failureHandlerSpy.failureHandlerCalled)
         XCTAssertEqual(failureHandlerSpy.failureMessagePassed, containerFailure.localizedDescription)
     }
+    
+    func test_setup_shouldPerformAditionalSetups() {
+        // Given
+        CustomSetupModuleMock.container = nil
+        // When
+        CustomSetupModuleMock.initialize()
+        // Then
+        XCTAssertTrue(CustomSetupModuleMock.setupCalled)
+    }
 }
 
 // MARK: - Test Doubles
 
+private protocol InternalDependencyProtocol {}
+private final class InternalDependency: InternalDependencyProtocol {}
+
 extension ModuleTests {
     enum TestModule: Module {
         static var container: DependencyContainerInterface!
-        static var failureHandler: ModuleFailureHandler!
+    }
+    
+    enum CustomSetupModuleMock: Module {
+        static var container: DependencyContainerInterface!
+        static var setupCalled = false
+        
+        static func setup(_ container: DependencyContainerInterface, _ failureHandler: (@autoclosure () -> String, StaticString, UInt) -> Void) {
+            setupCalled = true
+        }
     }
 }
 
