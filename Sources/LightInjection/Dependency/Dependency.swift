@@ -16,9 +16,9 @@ public final class Dependency<T> {
 
     // MARK: - Properties
 
-    public var wrappedValue: T! {
+    public var wrappedValue: T {
         resolveIfNeeded()
-        return resolvedValue
+        return resolvedValue!
     }
 
     // MARK: - Initialization
@@ -81,4 +81,32 @@ public final class Dependency<T> {
             failureHandler(error.localizedDescription)
         }
     }
+}
+
+// Tests
+
+protocol DependencyAProtocol {
+    func doStuff()
+}
+
+final class DependencyA: DependencyAProtocol {
+    func doStuff() {
+        print("Stuff A")
+    }
+}
+
+struct DependencyB {
+    let doStuff: () -> Void
+}
+extension DependencyB {
+    static let live: Self = .init(
+        doStuff: { print("Stuff B") }
+    )
+}
+
+
+
+struct EnvironmentTest {
+    @Dependency var dependencyA: DependencyAProtocol
+    @Dependency var dependencyB: DependencyB
 }
