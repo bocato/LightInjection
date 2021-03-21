@@ -82,31 +82,3 @@ public final class Dependency<T> {
         }
     }
 }
-
-// Tests
-
-protocol DependencyAProtocol {
-    func doStuff()
-}
-
-final class DependencyA: DependencyAProtocol {
-    func doStuff() {
-        print("Stuff A")
-    }
-}
-
-struct DependencyB {
-    let doStuff: () -> Void
-}
-extension DependencyB {
-    static let live: Self = .init(
-        doStuff: { print("Stuff B") }
-    )
-}
-
-
-
-struct EnvironmentTest {
-    @Dependency var dependencyA: DependencyAProtocol
-    @Dependency var dependencyB: DependencyB
-}
