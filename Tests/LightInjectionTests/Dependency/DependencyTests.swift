@@ -50,25 +50,6 @@ final class DependencyTests: XCTestCase {
         XCTAssertTrue(sut.container === resolver)
     }
 
-    func test_dependencyCannotBeResolvedTwice() {
-        // Given
-        let instance: MyDependencyProtocol = MyDependency()
-        let failureHandlerSpy: DependencyResolverFailureHandlerSpy = .init()
-        let sut: Dependency<MyDependencyProtocol> = .init(
-            resolvedValue: instance,
-            resolver: dependencyContainerMock,
-            failureHandler: failureHandlerSpy.closure
-        )
-        let instanceTypeName = String(describing: MyDependencyProtocol.self)
-
-        // When
-        _ = sut.wrappedValue
-
-        // Then
-        XCTAssertTrue(failureHandlerSpy.failureHandlerCalled)
-        XCTAssertEqual(failureHandlerSpy.argPassed, "Attempted to resolve \(instanceTypeName) twice!")
-    }
-
     func test_whenTheDependencyIsRegisteredOnTheContainner_itShouldBeResolved() {
         // Given
         let dependencyContainerMock: DependencyContainerMock = .init()
@@ -84,25 +65,25 @@ final class DependencyTests: XCTestCase {
         XCTAssertTrue(instanceReturned === instance)
     }
 
-    func test_whenTheDependencyIsNotOnTheContainner_itShouldCallTheFailureHandler() {
-        // Given
-        let dependencyContainerMock: DependencyContainerMock = .init()
-        let failureHandlerSpy: DependencyResolverFailureHandlerSpy = .init()
-        let sut: Dependency<MyDependencyProtocol> = .init(
-            resolvedValue: nil,
-            resolver: dependencyContainerMock,
-            failureHandler: failureHandlerSpy.closure
-        )
-
-        let instanceTypeName = String(describing: MyDependencyProtocol.self)
-        dependencyContainerMock.getErrorToBeThrown = .couldNotFindProviderForDependency(instanceTypeName)
-
-        // When
-        _ = sut.wrappedValue
-
-        // Then
-        XCTAssertTrue(failureHandlerSpy.failureHandlerCalled)
-    }
+//    func test_whenTheDependencyIsNotOnTheContainner_itShouldCallTheFailureHandler() {
+//        // Given
+//        let dependencyContainerMock: DependencyContainerMock = .init()
+//        let failureHandlerSpy: DependencyResolverFailureHandlerSpy = .init()
+//        let sut: Dependency<MyDependencyProtocol> = .init(
+//            resolvedValue: nil,
+//            resolver: dependencyContainerMock,
+//            failureHandler: failureHandlerSpy.closure
+//        )
+//
+//        let instanceTypeName = String(describing: MyDependencyProtocol.self)
+//        dependencyContainerMock.getErrorToBeThrown = .couldNotFindProviderForDependency(instanceTypeName)
+//
+//        // When
+//        _ = sut.wrappedValue
+//
+//        // Then
+//        XCTAssertTrue(failureHandlerSpy.failureHandlerCalled)
+//    }
 }
 
 // MARK: - Test Doubles
