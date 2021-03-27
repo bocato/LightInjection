@@ -10,7 +10,7 @@ public final class Dependency<T> {
     // MARK: - Dependencies
 
     private var resolvedValue: T!
-    private var userResolved = false
+    private var instanceProvider: InstanceProvider = .container
     let container: DependencyContainerInterface
     let failureHandler: DependencyResolverFailureHandler
 
@@ -29,7 +29,7 @@ public final class Dependency<T> {
         failureHandler: @escaping DependencyResolverFailureHandler = { msg in preconditionFailure(msg) }
     ) {
         self.resolvedValue = resolvedValue
-        container = resolver
+        self.container = resolver
         self.failureHandler = failureHandler
     }
 
@@ -61,24 +61,25 @@ public final class Dependency<T> {
             resolvedValue: instance,
             resolver: DependencyContainer.global
         )
-        instance.userResolved = true
+        instance.instanceProvider = .user
         return instance
     }
 
     // MARK: - Private Methods
 
     private func resolveIfNeeded() {
-        guard resolvedValue == nil else {
-            if userResolved == false {
-                failureHandler("Attempted to resolve \(String(describing: T.self)) twice!")
-            }
-            return
-        }
-
+        guard resolvedValue == nil else { return }
+        
         do {
             resolvedValue = try container.get(T.self)
         } catch {
             failureHandler(error.localizedDescription)
         }
+    }
+}
+extension Dependency {
+    enum InstanceProvider: Equatable {
+        case container
+        case user
     }
 }
